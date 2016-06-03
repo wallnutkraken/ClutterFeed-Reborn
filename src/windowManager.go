@@ -7,6 +7,11 @@ import (
 	"github.com/rthornton128/goncurses"
 )
 
+func addStringAt(window *goncurses.Window, content string, ypos int, xpos int) {
+	window.Move(ypos, xpos)
+	addString(window, content)
+}
+
 func addString(window *goncurses.Window, content string) {
 	var currentChar goncurses.Char
 	allChars := []rune(content)[:]
@@ -14,6 +19,10 @@ func addString(window *goncurses.Window, content string) {
 		currentChar = goncurses.Char(allChars[i])
 		window.AddChar(currentChar)
 	}
+}
+
+func drawHeader(username string) {
+	panic("Not implemented")
 }
 
 func initScreen() []*goncurses.Window {

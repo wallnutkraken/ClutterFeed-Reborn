@@ -20,7 +20,9 @@ var (
 
 func main() {
 	myWindows := initScreen()
+
 	defer goncurses.End()
+	fmt.Println(myWindows) /* Uh yeah, not really production code */
 }
 
 func fatalErrorCheck(err error) {
