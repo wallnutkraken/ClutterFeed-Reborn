@@ -37,6 +37,10 @@ var (
 func readConfig() (ClutterFeedConfigFile, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			defaultConf := getDefaultConfigFile()
+			return defaultConf, writeConfig(defaultConf)
+		}
 		return ClutterFeedConfigFile{}, err
 	}
 	decoder := json.NewDecoder(file)
@@ -59,4 +63,21 @@ func writeConfig(settings ClutterFeedConfigFile) error {
 	encoder := json.NewEncoder(file)
 	err := encoder.Encode(settings)
 	return err
+}
+
+func getDefaultConfigFile() ClutterFeedConfigFile {
+	/* Oh boy here we go. The reason this exists is because you cannot have a constant */
+	/* from a struct literal, so we have this instead. What an ugly workaround. */
+	defaultConfigFile := ClutterFeedConfigFile{
+		ApiTokenPair{},
+		ApiTokenPair{"g66DNw8cKonlyAdqMO2XBw", "XRpxFt8KSHFvKbHKVq7tIxWpsKsOHj7Bda5XriPQ2Zg"},
+		ColorSetting{30, 20, 140},
+		ColorSetting{0, 150, 20},
+		ColorSetting{250, 180, 30},
+		ColorSetting{175, 0, 200},
+		ColorSetting{255, 0, 0},
+		ColorSetting{255, 85, 0},
+	}
+
+	return defaultConfigFile
 }
