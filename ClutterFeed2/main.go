@@ -13,16 +13,13 @@ const (
 	CF_RELEASE = "TBD"
 )
 
-var (
-	SIZE_X int
-	SIZE_Y int
-)
-
 func main() {
-	myWindows := initScreen()
+	initScreen()
 
+	defer HeaderWindow.Delete()
+	defer MainWindow.Delete()
+	defer CommandWindow.Delete()
 	defer goncurses.End()
-	fmt.Println(myWindows) /* Uh yeah, not really production code */
 }
 
 func fatalErrorCheck(err error) {
