@@ -42,10 +42,13 @@ func initScreen() []*goncurses.Window {
 	/* The second window being the main timeline window */
 	timelineWindow, err := goncurses.NewWindow(SIZE_Y-3, SIZE_X, 1, 0)
 	fatalErrorCheck(err)
+	timelineWindow.ScrollOk(true)
 	windows[1] = timelineWindow
 
 	/* And the final command window */
 	commandWindow, err := goncurses.NewWindow(2, SIZE_X, SIZE_Y-2, 0)
+	fatalErrorCheck(err)
+	commandWindow.Keypad(true) /* Will allow us to use the keypad in the console */
 	fatalErrorCheck(err)
 	windows[2] = commandWindow
 
