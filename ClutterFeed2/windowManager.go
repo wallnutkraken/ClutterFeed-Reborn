@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/rthornton128/goncurses"
 )
@@ -61,5 +63,17 @@ func initScreen() []*goncurses.Window {
 	fatalErrorCheck(err)
 	windows[2] = commandWindow
 
+	/* And finally, create a goroutine and a channel for when the terminal is resized */
+	resizeChannel := make(chan os.Signal)
+	signal.Notify(resizeChannel, syscall.SIGWINCH)
+	go onResize(resizeChannel)
+
 	return windows
+}
+
+func onResize(resizeChannel chan os.Signal) {
+	for {
+		<-resizeChannel
+		/* do resizing stuff */
+	}
 }
