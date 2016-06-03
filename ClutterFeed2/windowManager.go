@@ -10,6 +10,11 @@ import (
 )
 
 var (
+	SIZE_X int
+	SIZE_Y int
+)
+
+var (
 	HeaderWindow  *goncurses.Window
 	MainWindow    *goncurses.Window
 	CommandWindow *goncurses.Window
@@ -49,16 +54,17 @@ func initScreen() {
 	SIZE_Y, SIZE_X = stdscr.MaxYX()
 
 	/* Create header window */
-	HeaderWindow, err := goncurses.NewWindow(1, SIZE_X, 0, 0)
+	HeaderWindow, err = goncurses.NewWindow(1, SIZE_X, 0, 0)
+	HeaderWindow.AttrOn(goncurses.A_BOLD)
 	fatalErrorCheck(err)
 
 	/* The second window being the main timeline window */
-	MainWindow, err := goncurses.NewWindow(SIZE_Y-3, SIZE_X, 1, 0)
+	MainWindow, err = goncurses.NewWindow(SIZE_Y-3, SIZE_X, 1, 0)
 	fatalErrorCheck(err)
 	MainWindow.ScrollOk(true)
 
 	/* And the final command window */
-	CommandWindow, err := goncurses.NewWindow(2, SIZE_X, SIZE_Y-2, 0)
+	CommandWindow, err = goncurses.NewWindow(2, SIZE_X, SIZE_Y-2, 0)
 	fatalErrorCheck(err)
 	CommandWindow.Keypad(true) /* Will allow us to use the keypad in the console */
 	fatalErrorCheck(err)
@@ -72,6 +78,20 @@ func initScreen() {
 func onResize(resizeChannel chan os.Signal) {
 	for {
 		<-resizeChannel
-		/* do resizing stuff */
+		SIZE_Y, SIZE_X = goncurses.StdScr().MaxYX()
+
+		HeaderWindow.Resize(1, SIZE_X)
+		HeaderWindow.Move(0, 0)
+		HeaderWindow.Refresh()
+
+		MainWindow.Resize(SIZE_Y-3, SIZE_X)
+		MainWindow.Move(1, 0)
+		MainWindow.Refresh()
+
+		CommandWindow.Resize(2, SIZE_X)
+		CommandWindow.Move(SIZE_Y-2, 0)
+		CommandWindow.Refresh()
+
+		/* Todo: handle redrawing */
 	}
 }
