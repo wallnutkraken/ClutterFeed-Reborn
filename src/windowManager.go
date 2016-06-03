@@ -7,8 +7,19 @@ import (
 	"github.com/rthornton128/goncurses"
 )
 
+func addString(window *goncurses.Window, content string) {
+	var currentChar goncurses.Char
+	allChars := []rune(content)[:]
+	for i := range allChars {
+		currentChar = goncurses.Char(allChars[i])
+		window.AddChar(currentChar)
+	}
+}
+
 func initScreen() []*goncurses.Window {
 	stdscr, err := goncurses.Init()
+	goncurses.Echo(false)
+	goncurses.NewLines(true)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

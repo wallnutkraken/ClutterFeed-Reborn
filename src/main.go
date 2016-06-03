@@ -19,7 +19,8 @@ var (
 )
 
 func main() {
-	initScreen()
+	myWindows := initScreen()
+	defer goncurses.End()
 }
 
 func fatalErrorCheck(err error) {
