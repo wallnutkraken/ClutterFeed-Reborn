@@ -27,11 +27,14 @@ type ClutterFeedConfigFile struct {
 	Warning    ColorSetting
 }
 
-func readConfig() (ClutterFeedConfigFile, error) {
-	configPath := "clutterfeed.conf" /* TODO: Low priority: Use something like */
+var (
+	configPath = "clutterfeed.conf" /* TODO: Low priority: Use something like */
 	/* ~/.config/ClutterFeed or %AppData%/ClutterFeed to store this file. Ideally, */
 	/* there should exist a way to get the config folder for the current user. */
 	/* That would be the best cross-platform solution */
+)
+
+func readConfig() (ClutterFeedConfigFile, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
 		return ClutterFeedConfigFile{}, err
@@ -45,5 +48,15 @@ func readConfig() (ClutterFeedConfigFile, error) {
 }
 
 func writeConfig(settings ClutterFeedConfigFile) error {
-	panic("Not implemented")
+	var file *os.File
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		/* Create the config file if it does not already exist */
+		file, err = os.Create(configPath)
+		if err != nil {
+			return err
+		}
+	}
+	encoder := json.NewEncoder(file)
+	err := encoder.Encode(settings)
+	return err
 }
