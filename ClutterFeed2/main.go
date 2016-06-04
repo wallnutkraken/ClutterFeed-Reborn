@@ -13,9 +13,12 @@ const (
 	CF_RELEASE = "TBD"
 )
 
+var file *os.File
+
 func main() {
 	initScreen()
 
+	defer file.Close()
 	defer HeaderWindow.Delete()
 	defer MainWindow.Delete()
 	defer CommandWindow.Delete()
@@ -32,6 +35,6 @@ func fatalErrorCheck(err error) {
 
 func errToStderr(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintf(os.Stderr, err.Error()+"\n")
 	}
 }

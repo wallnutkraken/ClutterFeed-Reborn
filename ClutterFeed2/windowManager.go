@@ -49,6 +49,8 @@ func initScreen() {
 
 	if goncurses.HasColors() == false {
 		fmt.Fprintf(os.Stderr, "W: Console does not support color")
+	} else {
+		goncurses.StartColor()
 	}
 
 	SIZE_Y, SIZE_X = stdscr.MaxYX()

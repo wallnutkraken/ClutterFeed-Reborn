@@ -29,15 +29,16 @@ func drawConsole() {
 	CommandWindow.Clear()
 
 	CommandWindow.AttrOn(goncurses.A_BOLD)
-	//CommandWindow.Color() TODO: do these color sets
+	CommandWindow.Color(COMMAND_PAIR)
 	addString(CommandWindow, "[")
 	CommandWindow.Color(goncurses.C_WHITE)
 	addString(CommandWindow, fmt.Sprintf("%03d", len(currentConsoleCommand)))
-	//CommandWindow.Color() see TODO above
+	CommandWindow.Color(COMMAND_PAIR)
 	addString(CommandWindow, "] > ")
 	CommandWindow.AttrOff(goncurses.A_BOLD)
 	CommandWindow.Color(goncurses.C_WHITE)
 
+	CommandWindow.GetChar()
 	panic("Not done. Chill out. I really need to think this through before it becomes another shit console")
 }
 

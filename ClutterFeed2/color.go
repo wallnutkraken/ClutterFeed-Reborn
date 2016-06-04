@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/rthornton128/goncurses"
 )
+
+const RGB_TO_CURSES_MULTIPLIER = 1000.0 / 255.0
 
 /* Constants for color pairs that have meaning after initColors() finishes */
 const (
@@ -18,7 +17,7 @@ const (
 )
 
 const (
-	C_IDENTIFIER = 51
+	C_IDENTIFIER = 91
 	C_OWNTWEET
 	C_MENTION
 	C_COMMAND
@@ -27,7 +26,7 @@ const (
 )
 
 func initColors(config ClutterFeedConfigFile) {
-	err := initSingleColor(config.Identifier, C_IDENTIFIER, IDENTIFIER_PAIR)
+	err = initSingleColor(config.Identifier, C_IDENTIFIER, IDENTIFIER_PAIR)
 	errToStderr(err)
 
 	err = initSingleColor(config.OwnTweet, C_OWNTWEET, OWNTWEET_PAIR)
@@ -42,12 +41,15 @@ func initColors(config ClutterFeedConfigFile) {
 	err = initSingleColor(config.Error, C_ERROR, ERROR_PAIR)
 	errToStderr(err)
 
-	err = initSingleColor(config.Warning, C_WARNING.WARNING_PAIR)
+	err = initSingleColor(config.Warning, C_WARNING, WARNING_PAIR)
 	errToStderr(err)
 }
 
 func initSingleColor(colorInfo ColorSetting, colorId int16, pairId int16) error {
-	err := goncurses.InitColor(colorId, colorInfo.Red, colorInfo.Green, colorInfo.Blue)
+	red := int16(RGB_TO_CURSES_MULTIPLIER * float32(colorInfo.Red))
+	green := int16(RGB_TO_CURSES_MULTIPLIER * float32(colorInfo.Green))
+	blue := int16(RGB_TO_CURSES_MULTIPLIER * float32(colorInfo.Blue))
+	err := goncurses.InitColor(colorId, red, green, blue)
 	if err != nil {
 		return err
 	}
