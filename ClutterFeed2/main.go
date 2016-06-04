@@ -29,3 +29,9 @@ func fatalErrorCheck(err error) {
 		os.Exit(1)
 	}
 }
+
+func errToStderr(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+	}
+}
