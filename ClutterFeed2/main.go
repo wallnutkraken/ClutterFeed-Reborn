@@ -13,12 +13,9 @@ const (
 	CF_RELEASE = "TBD"
 )
 
-var file *os.File
-
 func main() {
 	initScreen()
 
-	defer file.Close()
 	defer HeaderWindow.Delete()
 	defer MainWindow.Delete()
 	defer CommandWindow.Delete()
