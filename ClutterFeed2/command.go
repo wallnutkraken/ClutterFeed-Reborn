@@ -57,6 +57,7 @@ func drawConsole() {
 	CommandWindow.ColorOff(COMMAND_PAIR)
 
 	CommandWindow.Print(currentConsoleCommand)
+	CommandWindow.Refresh()
 }
 
 func handleInput(in chan goncurses.Key) {
