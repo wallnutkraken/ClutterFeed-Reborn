@@ -1,3 +1,5 @@
 #Binary output folder
 [Bb]in/
 
+#config files
+*.conf
