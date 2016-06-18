@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/rthornton128/goncurses"
 )
@@ -13,13 +14,27 @@ const (
 	CF_RELEASE = "TBD"
 )
 
+var applicationFinished sync.WaitGroup
+
 func main() {
+	startLog()
 	initScreen()
+
+	applicationConfiguration, err := readConfig()
+	if err != nil {
+		applicationConfiguration = getDefaultConfigFile()
+	}
+	initColors(applicationConfiguration)
+
+	startCommandConsole()
+	applicationFinished.Add(1)
+	applicationFinished.Wait()
 
 	defer HeaderWindow.Delete()
 	defer MainWindow.Delete()
 	defer CommandWindow.Delete()
 	defer goncurses.End()
+	defer endLogging()
 }
 
 func fatalErrorCheck(err error) {

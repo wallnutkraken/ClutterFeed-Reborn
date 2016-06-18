@@ -26,7 +26,7 @@ const (
 )
 
 func initColors(config ClutterFeedConfigFile) {
-	err = initSingleColor(config.Identifier, C_IDENTIFIER, IDENTIFIER_PAIR)
+	err := initSingleColor(config.Identifier, C_IDENTIFIER, IDENTIFIER_PAIR)
 	errToStderr(err)
 
 	err = initSingleColor(config.OwnTweet, C_OWNTWEET, OWNTWEET_PAIR)
