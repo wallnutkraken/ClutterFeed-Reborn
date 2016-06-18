@@ -82,6 +82,12 @@ func handleInput(in chan goncurses.Key) {
 		if gotChar == goncurses.KEY_RETURN || gotChar == goncurses.KEY_ENTER {
 			/* finished command */
 			parseCommandText()
+		} else if int(gotChar) == 127 {
+			/* 127 is backspace */
+			if len(currentConsoleCommand) > 0 {
+				/* Removes last character, if it exists */
+				currentConsoleCommand = currentConsoleCommand[0 : len(currentConsoleCommand)-1]
+			}
 		} else {
 			currentConsoleCommand += string(rune(gotChar)) /* Heh, adding a char */
 			/* to a string in Go isn't the most pleasant thing ever */
