@@ -20,20 +20,6 @@ var (
 	CommandWindow *goncurses.Window
 )
 
-func addStringAt(window *goncurses.Window, content string, ypos int, xpos int) {
-	window.Move(ypos, xpos)
-	addString(window, content)
-}
-
-func addString(window *goncurses.Window, content string) {
-	var currentChar goncurses.Char
-	allChars := []rune(content)[:]
-	for i := range allChars {
-		currentChar = goncurses.Char(allChars[i])
-		window.AddChar(currentChar)
-	}
-}
-
 func drawHeader(username string) {
 	panic("Not implemented")
 }

@@ -17,7 +17,6 @@ const (
 var applicationFinished sync.WaitGroup
 
 func main() {
-	startLog()
 	initScreen()
 
 	applicationConfiguration, err := readConfig()
@@ -34,7 +33,6 @@ func main() {
 	defer MainWindow.Delete()
 	defer CommandWindow.Delete()
 	defer goncurses.End()
-	defer endLogging()
 }
 
 func fatalErrorCheck(err error) {

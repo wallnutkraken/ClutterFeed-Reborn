@@ -43,16 +43,20 @@ func drawConsole() {
 	CommandWindow.Clear()
 
 	CommandWindow.AttrOn(goncurses.A_BOLD)
+
 	CommandWindow.ColorOn(COMMAND_PAIR)
-	addString(CommandWindow, "[")
-	CommandWindow.ColorOff(COMMAND_PAIR)
-	addString(CommandWindow, fmt.Sprintf("%03d", len(currentConsoleCommand)))
-	CommandWindow.ColorOn(COMMAND_PAIR)
-	addString(CommandWindow, "] > ")
-	CommandWindow.AttrOff(goncurses.A_BOLD)
+	CommandWindow.Print("[")
 	CommandWindow.ColorOff(COMMAND_PAIR)
 
-	addString(CommandWindow, currentConsoleCommand)
+	CommandWindow.Print(fmt.Sprintf("%03d", len(currentConsoleCommand)))
+
+	CommandWindow.ColorOn(COMMAND_PAIR)
+	CommandWindow.Print("] > ")
+	CommandWindow.AttrOff(goncurses.A_BOLD)
+
+	CommandWindow.ColorOff(COMMAND_PAIR)
+
+	CommandWindow.Print(currentConsoleCommand)
 }
 
 func handleInput(in chan goncurses.Key) {
@@ -69,7 +73,7 @@ func handleInput(in chan goncurses.Key) {
 		} else {
 			currentConsoleCommand += string(rune(gotChar)) /* Heh, adding a char */
 			/* to a string in Go isn't the most pleasant thing ever */
-			drawConsole()
 		}
+		drawConsole()
 	}
 }
