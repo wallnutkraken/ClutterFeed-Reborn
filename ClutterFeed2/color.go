@@ -14,6 +14,7 @@ const (
 	COMMAND_PAIR
 	ERROR_PAIR
 	WARNING_PAIR
+	WHITE_PAIR
 )
 
 const (
@@ -26,6 +27,9 @@ const (
 )
 
 func initColors(config ClutterFeedConfigFile) {
+	/* Init default black/white pair */
+	goncurses.InitPair(WHITE_PAIR, goncurses.C_WHITE, goncurses.C_BLACK)
+
 	err := initSingleColor(config.Identifier, C_IDENTIFIER, IDENTIFIER_PAIR)
 	errToStderr(err)
 

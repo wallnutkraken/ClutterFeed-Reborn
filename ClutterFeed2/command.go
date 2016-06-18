@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/rthornton128/goncurses"
 )
@@ -30,13 +31,28 @@ func startCommandConsole() error {
 	return nil
 }
 
+/* Checks if a key is a valid key someone could input into the screen, and not */
+/* something like an artifact from resizing */
+func isValidKey(key goncurses.Key) bool {
+	if key == 410 { /* Resizing artifact */
+		return false
+	}
+
+	return true
+}
+
 func getInput(in chan goncurses.Key) {
 	for exiting == false {
 		pressedKey := CommandWindow.GetChar()
-		if canAcceptInput {
+		if canAcceptInput && isValidKey(pressedKey) {
 			in <- pressedKey
 		}
 	}
+}
+
+/* Grabs the cursor and places it whereever it should be in the current string */
+func grabCommandCursor() {
+	CommandWindow.Refresh()
 }
 
 func drawConsole() {
@@ -50,11 +66,11 @@ func drawConsole() {
 
 	CommandWindow.Print(fmt.Sprintf("%03d", len(currentConsoleCommand)))
 
-	CommandWindow.ColorOn(COMMAND_PAIR)
+	CommandWindow.ColorOn(WARNING_PAIR)
 	CommandWindow.Print("] > ")
 	CommandWindow.AttrOff(goncurses.A_BOLD)
 
-	CommandWindow.ColorOff(COMMAND_PAIR)
+	CommandWindow.ColorOff(WARNING_PAIR)
 
 	CommandWindow.Print(currentConsoleCommand)
 	CommandWindow.Refresh()
@@ -65,16 +81,34 @@ func handleInput(in chan goncurses.Key) {
 		gotChar := <-in
 		if gotChar == goncurses.KEY_RETURN || gotChar == goncurses.KEY_ENTER {
 			/* finished command */
-			if currentConsoleCommand == "exit" {
-				close(in)
-				exiting = true
-				applicationFinished.Done()
-			}
-			currentConsoleCommand = ""
+			parseCommandText()
 		} else {
 			currentConsoleCommand += string(rune(gotChar)) /* Heh, adding a char */
 			/* to a string in Go isn't the most pleasant thing ever */
 		}
 		drawConsole()
+	}
+}
+
+func parseCommandText() {
+	currentConsoleCommand = strings.Trim(currentConsoleCommand, " ")
+	if strings.HasPrefix(currentConsoleCommand, "/") {
+		commands()
+	}
+
+	/* Reset command once we're done */
+	currentConsoleCommand = ""
+}
+
+/* Function that handles what happens when a / command is inputted */
+func commands() {
+	command := currentConsoleCommand[1:len(currentConsoleCommand)] /* remove / */
+
+	if strings.EqualFold(command, "exit") {
+		exiting = true
+		applicationFinished.Done()
+	} else {
+		writeMessage("No such command.", ERROR)
+		goncurses.Update()
 	}
 }

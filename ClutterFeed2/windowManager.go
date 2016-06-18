@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/rthornton128/goncurses"
@@ -19,6 +20,13 @@ var (
 	HeaderWindow  *goncurses.Window
 	MainWindow    *goncurses.Window
 	CommandWindow *goncurses.Window
+)
+
+/* Message severity for writeMessage() */
+const (
+	DEFAULT = 0
+	WARNING = 1
+	ERROR   = 2
 )
 
 func drawHeader() {
@@ -43,6 +51,8 @@ func drawHeader() {
 	}
 
 	HeaderWindow.Refresh()
+
+	grabCommandCursor() /* Moves cursor to command window */
 }
 
 func printAtEnd(window *goncurses.Window, content string) error {
@@ -56,6 +66,31 @@ func printAtEnd(window *goncurses.Window, content string) error {
 	window.MovePrint(y, startingPosition, content)
 
 	return nil
+}
+
+/* Writes a message to the Main Window. */
+func writeMessage(content string, severity int) {
+	var color int16
+	var prefix string /* A prefix to the message like [W] (for warnings) or [E] */
+	switch severity {
+	case WARNING:
+		color = WARNING
+		prefix = "  [W] "
+	case ERROR:
+		color = ERROR_PAIR
+		prefix = "  [E] "
+	default:
+		color = WHITE_PAIR
+		prefix = "      "
+	}
+
+	MainWindow.Color(WHITE_PAIR)
+	//MainWindow.ColorOn(color)
+	MainWindow.Print(prefix + strconv.Itoa(int(color)))
+	//MainWindow.ColorOff(color)
+	MainWindow.Print("\n")
+
+	MainWindow.Refresh()
 }
 
 func initScreen() {
@@ -100,6 +135,10 @@ func initScreen() {
 func onResize(resizeChannel chan os.Signal) {
 	for {
 		<-resizeChannel
+		/* End curses to update terminal info. */
+		goncurses.End()
+		goncurses.Update()
+
 		SIZE_Y, SIZE_X = goncurses.StdScr().MaxYX()
 
 		HeaderWindow.Resize(1, SIZE_X)

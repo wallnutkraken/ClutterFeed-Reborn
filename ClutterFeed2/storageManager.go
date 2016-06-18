@@ -76,7 +76,7 @@ func getDefaultConfigFile() ClutterFeedConfigFile {
 		ColorSetting{250, 180, 30},
 		ColorSetting{175, 0, 200},
 		ColorSetting{255, 0, 0},
-		ColorSetting{255, 85, 0},
+		ColorSetting{255, 225, 0},
 	}
 
 	return defaultConfigFile
