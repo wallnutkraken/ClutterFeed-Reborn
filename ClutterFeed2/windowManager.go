@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -20,8 +21,41 @@ var (
 	CommandWindow *goncurses.Window
 )
 
-func drawHeader(username string) {
-	panic("Not implemented")
+func drawHeader() {
+	HeaderWindow.Clear()
+
+	nameStr := "ClutterFeed " + CF_RELEASE + " (" + CF_VERSION + ")"
+	loggedInStrLong := "Logged in as: (@" + TEMP_username + ")"
+	loggedInStrShort := "@" + TEMP_username
+	loggedInStrToWrite := loggedInStrLong /* Default string to write if there */
+	/* are no problems */
+
+	HeaderWindow.Print(nameStr)
+
+	if SIZE_X-len(nameStr) < len(loggedInStrLong) {
+		loggedInStrToWrite = loggedInStrShort
+	}
+
+	err := printAtEnd(HeaderWindow, loggedInStrToWrite)
+
+	if err != nil {
+		err = printAtEnd(HeaderWindow, loggedInStrShort)
+	}
+
+	HeaderWindow.Refresh()
+}
+
+func printAtEnd(window *goncurses.Window, content string) error {
+	_, x := window.MaxYX()
+	y, _ := window.CursorYX()
+
+	if len(content)+1 > x {
+		return errors.New("Content is too long.")
+	}
+	startingPosition := x - len(content) - 1
+	window.MovePrint(y, startingPosition, content)
+
+	return nil
 }
 
 func initScreen() {
@@ -81,5 +115,6 @@ func onResize(resizeChannel chan os.Signal) {
 		CommandWindow.Refresh()
 
 		/* Todo: handle redrawing */
+		drawHeader()
 	}
 }

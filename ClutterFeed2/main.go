@@ -14,6 +14,9 @@ const (
 	CF_RELEASE = "TBD"
 )
 
+const TEMP_username = "username" /* ONLY TEMPORARY */
+/* Will be removed once logging in with Twitter is added */
+
 var applicationFinished sync.WaitGroup
 
 func main() {
@@ -24,6 +27,7 @@ func main() {
 		applicationConfiguration = getDefaultConfigFile()
 	}
 	initColors(applicationConfiguration)
+	drawHeader()
 
 	startCommandConsole()
 	applicationFinished.Add(1)
