@@ -10,8 +10,11 @@ import (
 
 var (
 	currentConsoleCommand string
-	canAcceptInput        bool
-	exiting               bool
+	horizontalStrPosition int
+	verticalStrPosition   int
+
+	canAcceptInput bool
+	exiting        bool
 )
 
 func startCommandConsole() error {
@@ -31,27 +34,11 @@ func startCommandConsole() error {
 	return nil
 }
 
-/* Checks if a key is a valid key someone could input into the screen, and not */
-/* something like an artifact from resizing */
-func isValidKey(key goncurses.Key) bool {
-	if key == 410 { /* Resizing artifact */
-		return false
-	}
-
-	return true
-}
-
-func getInput(in chan goncurses.Key) {
-	for exiting == false {
-		pressedKey := CommandWindow.GetChar()
-		if canAcceptInput && isValidKey(pressedKey) {
-			in <- pressedKey
-		}
-	}
-}
-
 /* Grabs the cursor and places it whereever it should be in the current string */
 func grabCommandCursor() {
+	/* 8 characters are reserved for the console counter and such */
+	xPlacement := 8 + horizontalStrPosition
+	CommandWindow.Move(verticalStrPosition, xPlacement)
 	CommandWindow.Refresh()
 }
 
@@ -64,7 +51,7 @@ func drawConsole() {
 	CommandWindow.Print("[")
 	CommandWindow.ColorOff(COMMAND_PAIR)
 
-	CommandWindow.Print(fmt.Sprintf("%03d", len(currentConsoleCommand)))
+	CommandWindow.Print(fmt.Sprintf("%03d", horizontalStrPosition))
 
 	CommandWindow.ColorOn(WARNING_PAIR)
 	CommandWindow.Print("] > ")
@@ -76,24 +63,9 @@ func drawConsole() {
 	CommandWindow.Refresh()
 }
 
-func handleInput(in chan goncurses.Key) {
-	for {
-		gotChar := <-in
-		if gotChar == goncurses.KEY_RETURN || gotChar == goncurses.KEY_ENTER {
-			/* finished command */
-			parseCommandText()
-		} else if int(gotChar) == 127 {
-			/* 127 is backspace */
-			if len(currentConsoleCommand) > 0 {
-				/* Removes last character, if it exists */
-				currentConsoleCommand = currentConsoleCommand[0 : len(currentConsoleCommand)-1]
-			}
-		} else {
-			currentConsoleCommand += string(rune(gotChar)) /* Heh, adding a char */
-			/* to a string in Go isn't the most pleasant thing ever */
-		}
-		drawConsole()
-	}
+/* Says whether the cursor was moved */
+func isCursorPosMoved() bool {
+	panic("Not implemented")
 }
 
 func parseCommandText() {
@@ -104,6 +76,7 @@ func parseCommandText() {
 
 	/* Reset command once we're done */
 	currentConsoleCommand = ""
+	horizontalStrPosition = 0
 }
 
 /* Function that handles what happens when a / command is inputted */
