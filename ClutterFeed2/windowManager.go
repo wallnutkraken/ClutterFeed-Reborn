@@ -62,7 +62,7 @@ func printAtEnd(window *goncurses.Window, content string) error {
 	if len(content)+1 > x {
 		return errors.New("Content is too long.")
 	}
-	startingPosition := x - len(content) - 1
+	startingPosition := x - len(content)
 	window.MovePrint(y, startingPosition, content)
 
 	return nil
@@ -129,9 +129,21 @@ func initScreen() {
 	fatalErrorCheck(err)
 
 	/* And finally, create a goroutine and a channel for when the terminal is resized */
+	/* and another one for when it's interrupted*/
 	resizeChannel := make(chan os.Signal)
 	signal.Notify(resizeChannel, syscall.SIGWINCH)
 	go onResize(resizeChannel)
+
+	interruptChannel := make(chan os.Signal)
+	signal.Notify(interruptChannel, syscall.SIGINT)
+	go onInterrupt(interruptChannel)
+}
+
+/* Makes sure that if an interrupt happens, curses would exit properly*/
+func onInterrupt(interruptChannel chan os.Signal) {
+	<-interruptChannel
+	goncurses.End()
+	os.Exit(1)
 }
 
 func onResize(resizeChannel chan os.Signal) {
