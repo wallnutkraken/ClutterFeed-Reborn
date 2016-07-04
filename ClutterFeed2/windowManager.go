@@ -123,7 +123,7 @@ func initScreen() {
 	/* And the final command window */
 	CommandWindow, err = goncurses.NewWindow(2, SIZE_X, SIZE_Y-2, 0)
 	fatalErrorCheck(err)
-	CommandWindow.Keypad(true)   /* Will allow us to use the keypad in the console */
+	CommandWindow.Keypad(true)
 	CommandWindow.ScrollOk(true) /* Would prevent crashes from happening when the */
 	/* terminal window is at a very small size */
 	fatalErrorCheck(err)

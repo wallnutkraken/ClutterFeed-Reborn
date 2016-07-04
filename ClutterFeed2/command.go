@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/rthornton128/goncurses"
@@ -11,22 +13,26 @@ import (
 var (
 	currentConsoleCommand string
 	horizontalStrPosition int
-	verticalStrPosition   int
 
 	canAcceptInput bool
 	exiting        bool
 )
+
+var debugFile *os.File
 
 func startCommandConsole() error {
 	/* Initialize the global vars */
 	canAcceptInput = true
 	exiting = false
 
+	debugFile, _ = os.Create("debug.conf")
+
 	if CommandWindow == nil {
 		return errors.New("Command window is not initialized")
 	}
 
 	inputChannel := make(chan goncurses.Key)
+
 	go getInput(inputChannel)
 	go handleInput(inputChannel)
 
@@ -38,6 +44,12 @@ func startCommandConsole() error {
 func grabCommandCursor() {
 	/* 8 characters are reserved for the console counter and such */
 	xPlacement := 8 + horizontalStrPosition
+	verticalStrPosition := 0
+	y, x := CommandWindow.MaxYX()
+	debugFile.WriteString("Attempting to move cursor. Scr size:" + strconv.Itoa(x) + ", " + strconv.Itoa(y) + ". New pos: " + strconv.Itoa(xPlacement) + ", " + strconv.Itoa(verticalStrPosition) + "\n")
+	if SIZE_X < 8+horizontalStrPosition {
+		verticalStrPosition = 1
+	}
 	CommandWindow.Move(verticalStrPosition, xPlacement)
 	CommandWindow.Refresh()
 }
@@ -51,7 +63,7 @@ func drawConsole() {
 	CommandWindow.Print("[")
 	CommandWindow.ColorOff(COMMAND_PAIR)
 
-	CommandWindow.Print(fmt.Sprintf("%03d", horizontalStrPosition))
+	CommandWindow.Print(fmt.Sprintf("%03d", len(currentConsoleCommand)))
 
 	CommandWindow.ColorOn(WARNING_PAIR)
 	CommandWindow.Print("] > ")

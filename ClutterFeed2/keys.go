@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/rthornton128/goncurses"
 )
 
@@ -20,7 +22,16 @@ func backspace() {
 	}
 }
 
+func goLeft() {
+	if horizontalStrPosition == 0 || len(currentConsoleCommand) == 0 {
+		return
+	}
+	horizontalStrPosition--
+	grabCommandCursor()
+}
+
 func handleInput(in chan goncurses.Key) {
+	CommandWindow.Keypad(true) /* Will allow us to use the keypad in the console */
 	for {
 		gotChar := <-in
 		if gotChar == goncurses.KEY_RETURN || gotChar == goncurses.KEY_ENTER {
@@ -31,6 +42,7 @@ func handleInput(in chan goncurses.Key) {
 			backspace()
 		} else if gotChar == goncurses.KEY_LEFT {
 			/* Move cursor position left */
+			goLeft()
 		} else {
 			currentConsoleCommand += string(rune(gotChar))
 			horizontalStrPosition++
