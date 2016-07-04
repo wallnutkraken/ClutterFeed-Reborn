@@ -19,6 +19,7 @@ var (
 )
 
 var debugFile *os.File
+var updateCursorChannel chan bool
 
 func startCommandConsole() error {
 	/* Initialize the global vars */
@@ -30,9 +31,10 @@ func startCommandConsole() error {
 	if CommandWindow == nil {
 		return errors.New("Command window is not initialized")
 	}
-
 	inputChannel := make(chan goncurses.Key)
+	updateCursorChannel = make(chan bool)
 
+	go grabCommandCursor()
 	go getInput(inputChannel)
 	go handleInput(inputChannel)
 
@@ -42,16 +44,26 @@ func startCommandConsole() error {
 
 /* Grabs the cursor and places it whereever it should be in the current string */
 func grabCommandCursor() {
-	/* 8 characters are reserved for the console counter and such */
-	xPlacement := 8 + horizontalStrPosition
-	verticalStrPosition := 0
-	y, x := CommandWindow.MaxYX()
-	debugFile.WriteString("Attempting to move cursor. Scr size:" + strconv.Itoa(x) + ", " + strconv.Itoa(y) + ". New pos: " + strconv.Itoa(xPlacement) + ", " + strconv.Itoa(verticalStrPosition) + "\n")
-	if SIZE_X < 8+horizontalStrPosition {
-		verticalStrPosition = 1
+	var value bool
+	for {
+		/* This is not the most pleasant way to use this function */
+		/* However, running this in a goroutine and waiting for */
+		/* input on a channel is the only method that I've tried */
+		/* which worked to update the command cursor thing. */
+		value = <-updateCursorChannel
+		if value == true {
+			/* 8 characters are reserved for the console counter and such */
+			xPlacement := 8 + horizontalStrPosition
+			verticalStrPosition := 0
+			y, x := CommandWindow.MaxYX()
+			debugFile.WriteString("Attempting to move cursor. Scr size:" + strconv.Itoa(x) + ", " + strconv.Itoa(y) + ". New pos: " + strconv.Itoa(xPlacement) + ", " + strconv.Itoa(verticalStrPosition) + "\n")
+			if SIZE_X < 8+horizontalStrPosition {
+				verticalStrPosition = 1
+			}
+			CommandWindow.Move(verticalStrPosition, xPlacement)
+			CommandWindow.Refresh()
+		}
 	}
-	CommandWindow.Move(verticalStrPosition, xPlacement)
-	CommandWindow.Refresh()
 }
 
 func drawConsole() {

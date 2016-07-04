@@ -51,8 +51,6 @@ func drawHeader() {
 	}
 
 	HeaderWindow.Refresh()
-
-	grabCommandCursor() /* Moves cursor to command window */
 }
 
 func printAtEnd(window *goncurses.Window, content string) error {

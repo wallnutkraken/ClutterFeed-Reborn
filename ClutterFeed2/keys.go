@@ -1,8 +1,6 @@
 package main
 
 import (
-	"strconv"
-
 	"github.com/rthornton128/goncurses"
 )
 
@@ -27,7 +25,7 @@ func goLeft() {
 		return
 	}
 	horizontalStrPosition--
-	grabCommandCursor()
+	updateCursorChannel <- true
 }
 
 func handleInput(in chan goncurses.Key) {
