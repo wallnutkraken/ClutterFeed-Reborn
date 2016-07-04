@@ -18,6 +18,15 @@ func backspace() {
 		currentConsoleCommand = preCut + postCut
 		horizontalStrPosition--
 	}
+	grabCommandCursor()
+}
+
+func goRight() {
+	if horizontalStrPosition == len(currentConsoleCommand) || len(currentConsoleCommand) == 0 {
+		return
+	}
+	horizontalStrPosition++
+	grabCommandCursor()
 }
 
 func goLeft() {
@@ -25,7 +34,22 @@ func goLeft() {
 		return
 	}
 	horizontalStrPosition--
-	updateCursorChannel <- true
+	grabCommandCursor()
+}
+
+func addCharacter(characterKey rune) {
+	char := string(characterKey) /* To easily concat the char to the current string */
+	if len(currentConsoleCommand) == horizontalStrPosition {
+		currentConsoleCommand += char
+	} else {
+		if horizontalStrPosition == 0 {
+			currentConsoleCommand = char + currentConsoleCommand
+		} else {
+			currentConsoleCommand = currentConsoleCommand[0:horizontalStrPosition] +
+				char + currentConsoleCommand[horizontalStrPosition:len(currentConsoleCommand)]
+		}
+	}
+	horizontalStrPosition++
 }
 
 func handleInput(in chan goncurses.Key) {
@@ -41,9 +65,11 @@ func handleInput(in chan goncurses.Key) {
 		} else if gotChar == goncurses.KEY_LEFT {
 			/* Move cursor position left */
 			goLeft()
+		} else if gotChar == goncurses.KEY_RIGHT {
+			/* Move the cursor position right */
+			goRight()
 		} else {
-			currentConsoleCommand += string(rune(gotChar))
-			horizontalStrPosition++
+			addCharacter(rune(gotChar))
 		}
 		drawConsole()
 	}

@@ -19,6 +19,8 @@ var (
 )
 
 var debugFile *os.File
+
+/* Ugly, but only way to make the cursor updating work as far as I know. */
 var updateCursorChannel chan bool
 
 func startCommandConsole() error {
@@ -34,7 +36,7 @@ func startCommandConsole() error {
 	inputChannel := make(chan goncurses.Key)
 	updateCursorChannel = make(chan bool)
 
-	go grabCommandCursor()
+	go cursorUpdate_goroutine()
 	go getInput(inputChannel)
 	go handleInput(inputChannel)
 
@@ -42,8 +44,14 @@ func startCommandConsole() error {
 	return nil
 }
 
-/* Grabs the cursor and places it whereever it should be in the current string */
+/* Puts focus on the command window and refreshes the cursor position */
 func grabCommandCursor() {
+	updateCursorChannel <- true
+}
+
+/* Goroutine that grabs the cursor and places it whereever it should be in the */
+/* current string */
+func cursorUpdate_goroutine() {
 	var value bool
 	for {
 		/* This is not the most pleasant way to use this function */
@@ -84,12 +92,12 @@ func drawConsole() {
 	CommandWindow.ColorOff(WARNING_PAIR)
 
 	CommandWindow.Print(currentConsoleCommand)
-	CommandWindow.Refresh()
+	grabCommandCursor()
 }
 
 /* Says whether the cursor was moved */
 func isCursorPosMoved() bool {
-	panic("Not implemented")
+	return len(currentConsoleCommand) == horizontalStrPosition
 }
 
 func parseCommandText() {
