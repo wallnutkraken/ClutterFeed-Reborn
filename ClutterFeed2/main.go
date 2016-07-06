@@ -12,6 +12,7 @@ import (
 const (
 	CF_VERSION = "2.0-DEV"
 	CF_RELEASE = "TBD"
+	DEBUG      = true
 )
 
 const TEMP_username = "username" /* ONLY TEMPORARY */

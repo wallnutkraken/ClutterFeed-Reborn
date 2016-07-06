@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 
 	"github.com/rthornton128/goncurses"
@@ -68,24 +67,26 @@ func printAtEnd(window *goncurses.Window, content string) error {
 
 /* Writes a message to the Main Window. */
 func writeMessage(content string, severity int) {
-	var color int16
-	var prefix string /* A prefix to the message like [W] (for warnings) or [E] */
+	var color int16 = WHITE_PAIR
+
+	/* A prefix to the message like [W] (for warnings) or [E] */
+	var prefix string = "      "
+
 	switch severity {
 	case WARNING:
-		color = WARNING
+		color = WARNING_PAIR
 		prefix = "  [W] "
 	case ERROR:
 		color = ERROR_PAIR
 		prefix = "  [E] "
-	default:
-		color = WHITE_PAIR
-		prefix = "      "
 	}
 
-	MainWindow.Color(WHITE_PAIR)
-	//MainWindow.ColorOn(color)
-	MainWindow.Print(prefix + strconv.Itoa(int(color)))
-	//MainWindow.ColorOff(color)
+	MainWindow.ColorOn(color)
+	MainWindow.Print(prefix)
+	MainWindow.AttrOn(goncurses.A_BOLD)
+	MainWindow.Print(content)
+	MainWindow.AttrOff(goncurses.A_BOLD)
+	MainWindow.ColorOff(color)
 	MainWindow.Print("\n")
 
 	MainWindow.Refresh()
@@ -167,5 +168,6 @@ func onResize(resizeChannel chan os.Signal) {
 
 		/* Todo: handle redrawing */
 		drawHeader()
+		grabCommandCursor()
 	}
 }

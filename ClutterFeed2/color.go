@@ -9,7 +9,7 @@ const RGB_TO_CURSES_MULTIPLIER = 1000.0 / 255.0
 /* Constants for color pairs that have meaning after initColors() finishes */
 const (
 	IDENTIFIER_PAIR = 101
-	OWNTWEET_PAIR
+	OWNTWEET_PAIR   = iota
 	MENTION_PAIR
 	COMMAND_PAIR
 	ERROR_PAIR
@@ -19,7 +19,7 @@ const (
 
 const (
 	C_IDENTIFIER = 91
-	C_OWNTWEET
+	C_OWNTWEET   = iota
 	C_MENTION
 	C_COMMAND
 	C_ERROR

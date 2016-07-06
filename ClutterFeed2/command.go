@@ -102,6 +102,9 @@ func isCursorPosMoved() bool {
 
 func parseCommandText() {
 	currentConsoleCommand = strings.Trim(currentConsoleCommand, " ")
+	if DEBUG {
+		writeMessage(currentConsoleCommand, DEFAULT)
+	}
 	if strings.HasPrefix(currentConsoleCommand, "/") {
 		commands()
 	}
